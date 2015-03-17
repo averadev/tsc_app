@@ -25,7 +25,7 @@ local cupones = {}
 local txtInfo, timeDownloading
 
 -- local urlApi = "http://localhost/thesavingcoupon/"
-local urlApi = "http://thesavingcoupon.com/beta/"
+local urlApi = "http://thesavingcoupon.com/"
 
 ---------------------------------------------------------------------------------
 -- FUNCTIONS

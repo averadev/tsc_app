@@ -21,7 +21,7 @@ local midX = display.contentCenterX
 local midY = display.contentCenterY
 local grpLogin, grpMask
 local imgLogo, sprLoading, txtEmail, txtPass
-local urlApi = "http://thesavingcoupon.com/beta/"
+local urlApi = "http://thesavingcoupon.com/"
 
 ---------------------------------------------------------------------------------
 -- FUNCTIONS
@@ -157,13 +157,13 @@ function scene:createScene( event )
     txtLogin:setFillColor( 1 )
     grpLogin:insert(txtLogin)
 	
-	local txtGetTSC = display.newText( "Get a coupon book", midX + 60, midY + 190, 250, 18, "OpenSans-ExtraBold", 18)
+	local txtGetTSC = display.newText( "Get a coupon book", midX + 60, midY + 190, 250, 22, "OpenSans-ExtraBold", 18)
     txtGetTSC:setFillColor( 1 )
+    txtGetTSC:addEventListener( "tap", getCouponBook )
     grpLogin:insert(txtGetTSC)
 	
-	local lineLink = display.newRect(  midX + 10, midY + 205, 200, 1 )
+	local lineLink = display.newRect(  midX + 15, midY + 210, 200, 1 )
 	lineLink:setFillColor( .3 )
-    lineLink:addEventListener( "tap", getCouponBook )
 	grpLogin:insert( lineLink )
     
     -- Loading
