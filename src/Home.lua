@@ -25,12 +25,12 @@ local midY = display.contentCenterY
 local sbH = display.topStatusBarContentHeight
 
 -- Variables
-local scrollView, bgShapeMenu, mask
+local scrollView, bgShapeMenu, mask, myMap
 local btnMenu, btnBack
 local items = {}
 local cupones = {}
 local lastY = 220
-local isHome = true
+local isHome, isLocation = true, false
 
 -- Arrays
 local txtPhones = { 
@@ -96,6 +96,7 @@ function cleanItems()
     items = {}
     lastY = 220
     -- Set scroll Top
+    scrollView:setIsLocked(false)
     scrollView:scrollToPosition( { y = 0 } )
 end
 
@@ -111,11 +112,56 @@ function getCouponsBy(id)
     showAll()
 end
 
+function verifyMap()
+	if myMap then
+        myMap:removeSelf()
+        myMap = nil
+    end
+end
+
+
+local locationHandler = function( event )
+	-- Check for error (user may have turned off Location Services)
+	if isLocation and myMap then
+        isLocation = false
+        Runtime:removeEventListener( "location", locationHandler )
+        
+        -- Set new location
+        myMap:setRegion( event.latitude, event.longitude, 0.03, 0.03, true )
+        
+        -- Comercios
+        cupones = DBManager.getComercios()
+        for z = 1, #cupones, 1 do 
+            -- Options
+            local options = { 
+                title = cupones[z].nombre, 
+                subtitle = cupones[z].servicios, 
+                listener = markerListener, 
+                imageFile = "img/btnIconMap.png"
+            }
+            -- Add Maker
+            print(cupones[z].nombre)
+            myMap:addMarker( tonumber(cupones[z].latitud), tonumber(cupones[z].longitud), options )
+        end
+    else
+        Runtime:removeEventListener( "location", locationHandler )
+	end
+end
+
 function getMap()
-    scrollView.alpha = 0
     cleanItems()
-    items[1] = display.newGroup()
+    scrollView:setIsLocked(true)
     
+    -- Mapa
+    local hMap = intY - (65 + sbH)
+    myMap = native.newMapView( midX, hMap / 2, intX, hMap )
+	if myMap then
+		myMap:setCenter( 20.511816, -86.938778, .2, .2 )
+		scrollView:insert(myMap)
+
+		isLocation = true
+		Runtime:addEventListener( "location", locationHandler )
+	end
 end
 
 function getAbout()
@@ -332,11 +378,18 @@ function addDetail(index)
     local txtDesc = display.newText(items[1], item.descripcion, midX, 90,  "OpenSans-Regular", 16)
     txtDesc:setFillColor( .2 )
     
-    local txtCode = display.newText(items[1], item.code, midX, 450,  "OpenSans-Semibold", 30)
-    txtCode:setFillColor( .4 )
-    local underline = display.newLine(items[1], midX - 60, 470, midX + 60, 470 )
-    underline:setStrokeColor( .4)
-    underline.strokeWidth = 2
+	if item.redimido == 1 then
+		local txtCode0 = display.newText(items[1], "Code: ", midX - 50, 455,  "OpenSans-Semibold", 30)
+		txtCode0:setFillColor( .2 )
+		local txtCode = display.newText(items[1], item.code, midX + 50, 455,  "OpenSans-ExtraBold", 30)
+		txtCode:setFillColor( .2 )
+		local underline = display.newLine(items[1], midX - 15, 475, midX + 120, 475 )
+		underline:setStrokeColor( .2)
+		underline.strokeWidth = 2
+	else
+		local txtCode = display.newText(items[1], "This coupon was redeemed.", midX, 455,  "OpenSans-Semibold", 30)
+		txtCode:setFillColor( 1, .65, .65 )
+	end
     
     local txtTelefono = display.newText(items[1], item.telefono, midX + 20, 520, 370, 22,  "OpenSans-Semibold", 18)
     txtTelefono:setFillColor( .4 )
@@ -364,7 +417,10 @@ function addDetail(index)
     bgShapeTWhite.height = termH + 58
     bgShapeT.y = 690 + (termH / 2)
     bgShapeTWhite.y = 690 + (termH / 2)
-    
+	
+	-- Margin Fix
+    local bgShapeTWhite = display.newRect(items[1], midX, 770 + termH, 1, 1 )
+    bgShapeTWhite:setFillColor( .95 )
 end
 
 ---------------------------------------------------------------------------------
@@ -413,7 +469,7 @@ function scene:createScene( event )
     btnBack.alpha = 0
     btnBack:addEventListener( "tap", showScroll )
     
-    local imgLogo = display.newImage(homeScreen, "img/menuAll.png", true) 
+    local imgLogo = display.newImage(homeScreen, "img/logo.png", true) 
     imgLogo.x = intX - 50
 	imgLogo.y = sbH + 35
     imgLogo.alpha = .5

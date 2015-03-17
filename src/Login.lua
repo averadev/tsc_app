@@ -11,6 +11,7 @@ local storyboard = require( "storyboard" )
 local Sprites = require('src.resources.Sprites')
 local DBManager = require('src.resources.DBManager')
 local widget = require( "widget" )
+local json = require("json")
 local scene = storyboard.newScene()
 
 -- Variables
@@ -20,6 +21,7 @@ local midX = display.contentCenterX
 local midY = display.contentCenterY
 local grpLogin, grpMask
 local imgLogo, sprLoading, txtEmail, txtPass
+local urlApi = "http://thesavingcoupon.com/beta/"
 
 ---------------------------------------------------------------------------------
 -- FUNCTIONS
@@ -34,21 +36,24 @@ function onTxtFocus(event)
     if ( "began" == event.phase ) then
         -- Interfaz Sign In
         if grpLogin.y == 0 then
-            transition.to( imgLogo, { y = 100, xScale=.5, yScale=.5, time = 400, transition = easing.outExpo } )
+            transition.to( imgLogo, { y = 130, xScale=.5, yScale=.5, time = 400, transition = easing.outExpo } )
             transition.to( grpLogin, { y = -150, time = 400, transition = easing.outExpo } )
         end
     elseif ( "submitted" == event.phase ) then
-        -- Hide Keyboard
-        getReturnButtons()
-        doSignIn()
+        getUser()
     end
 end
 
 function getReturnButtons()
     if not (grpLogin.y == 0) then
+		native.setKeyboardFocus(nil)
         transition.to( imgLogo, { y = midY / 2, xScale=1, yScale=1, time = 400, transition = easing.outExpo } )
         transition.to( grpLogin, { y = 0, time = 400, transition = easing.outExpo } )
     end
+end
+
+function getCouponBook()
+	system.openURL( "http://thesavingcoupon.com" )
 end
 
 function showMask(isDo)
@@ -62,13 +67,42 @@ function showMask(isDo)
     end
 end
 
-function doSignIn()
-    showMask(true)
-    getReturnButtons()
-    DBManager.updateUser(10,2)
-    timer.performWithDelay( 2000, function()
-        goToHome()
-    end, 1 )
+function urlencode(str)
+	  if (str) then
+		  str = string.gsub (str, "\n", "\r\n")
+		  str = string.gsub (str, "([^%w ])",
+		  function ( c ) return string.format ("%%%02X", string.byte( c )) end)
+		  str = string.gsub (str, " ", "%%20")
+	  end
+	  return str    
+end
+
+function getUser()
+	showMask(true)
+    local settings = DBManager.getSettings()
+    -- Set url
+    local url = urlApi.."api/verifyuser/format/json"
+    url = url.."/user/"..urlencode(txtEmail.text)
+	url = url.."/pass/"..txtPass.text
+
+    local function callback(event)
+        if ( event.isError ) then
+        else
+            local data = json.decode(event.response)
+			if data.success then
+				DBManager.updateUser(data.idCliente, data.idTipoCupon)
+            	getReturnButtons()
+				goToHome()
+			else
+				showMask(false)
+				native.showAlert( "TSC", data.message, { "OK"})
+			end
+        end
+        return true
+    end
+
+    -- Do request
+    network.request( url, "GET", callback ) 
 end
 
 ---------------------------------------------------------------------------------
@@ -101,25 +135,36 @@ function scene:createScene( event )
     txtEmail = native.newTextField( midX, midY - 30, 380, 60 )
     txtEmail.inputType = "email"
     txtEmail.hasBackground = false
-    txtEmail.placeholder = "you@abc.com"
+    txtEmail.placeholder = "your@email.com"
     txtEmail:addEventListener( "userInput", onTxtFocus )
 	grpLogin:insert(txtEmail)
     
     txtPass = native.newTextField( midX, midY + 35, 380, 60 )
     txtPass.isSecure = true
     txtPass.hasBackground = false
-    txtPass.placeholder = "my password"
+    txtPass.placeholder = "password"
     txtPass:addEventListener( "userInput", onTxtFocus )
 	grpLogin:insert(txtPass)
     
     local btnLogin = display.newRoundedRect( midX, midY + 120, 400, 65, 10 )
-    btnLogin:setFillColor( .231, .40, .557 ) 
-    btnLogin:addEventListener( "tap", doSignIn )
+    btnLogin:setFillColor( 70/255, 130/255, 180/255 ) 
+	btnLogin.stroke = { .8 }
+	btnLogin.strokeWidth = 2
+    btnLogin:addEventListener( "tap", getUser )
     grpLogin:insert(btnLogin)
     
-    local txtLogin = display.newText( "Log In", midX + 40, midY + 120, 150, 45, "OpenSans-ExtraBold", 28)
+    local txtLogin = display.newText( "Log In", midX + 40, midY + 125, 150, 45, "OpenSans-ExtraBold", 28)
     txtLogin:setFillColor( 1 )
     grpLogin:insert(txtLogin)
+	
+	local txtGetTSC = display.newText( "Get a coupon book", midX + 60, midY + 190, 250, 18, "OpenSans-ExtraBold", 18)
+    txtGetTSC:setFillColor( 1 )
+    grpLogin:insert(txtGetTSC)
+	
+	local lineLink = display.newRect(  midX + 10, midY + 205, 200, 1 )
+	lineLink:setFillColor( .3 )
+    lineLink:addEventListener( "tap", getCouponBook )
+	grpLogin:insert( lineLink )
     
     -- Loading
     grpMask = display.newGroup()
@@ -142,6 +187,7 @@ end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
+	storyboard.removeAll()
 end
 
 function scene:exitScene( event )
@@ -161,10 +207,8 @@ local function onKeyEvent( event )
     local phase = event.phase
     local keyName = event.keyName
     if ( "back" == keyName and phase == "up" ) then
-        if groupBtn.x < 0 then
-            getReturnButtons()
-            return true
-        end
+        getReturnButtons()
+        return true
     end
 end
 Runtime:addEventListener( "key", onKeyEvent )

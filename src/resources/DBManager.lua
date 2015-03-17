@@ -40,7 +40,7 @@ local dbManager = {}
             end
 		end
     
-        local query = "CREATE TABLE IF NOT EXISTS cupon (id INTEGER PRIMARY KEY, url TEXT, descripcion TEXT, fechaInicio TEXT, fechaFin TEXT, idComercio INTEGER, code TEXT, terminosCondiciones TEXT);"
+        local query = "CREATE TABLE IF NOT EXISTS cupon (id INTEGER PRIMARY KEY, url TEXT, descripcion TEXT, fechaInicio TEXT, fechaFin TEXT, idComercio INTEGER, code TEXT, terminosCondiciones TEXT, redimido INTEGER);"
 		db:exec( query )
     
         local query = "CREATE TABLE IF NOT EXISTS comercio (id INTEGER PRIMARY KEY, nombre TEXT, telefono TEXT, direccion TEXT, servicios TEXT, latitud TEXT, longitud TEXT);"
@@ -88,7 +88,7 @@ local dbManager = {}
     dbManager.updateUser = function(id, tipo)
 		openConnection( )
         local query = ''
-        query = "UPDATE config SET id = "..id ..", type="..tipo
+        query = "UPDATE config SET loaded = 0, id = "..id ..", type="..tipo
         db:exec( query )
 		closeConnection( )
 	end
@@ -126,7 +126,7 @@ local dbManager = {}
     dbManager.getCoupons = function()
 		local result, idx = {}, 1
 		openConnection( )
-		for row in db:nrows("SELECT cupon.id, cupon.url, cupon.descripcion, cupon.code, cupon.terminosCondiciones, comercio.nombre,"
+		for row in db:nrows("SELECT cupon.id, cupon.url, cupon.descripcion, cupon.code, cupon.terminosCondiciones, cupon.redimido, comercio.nombre,"
                             .." comercio.telefono, comercio.direccion FROM cupon join comercio on cupon.idComercio = comercio.id;") do
 			result[idx] = row
 			idx = idx + 1
@@ -182,7 +182,8 @@ local dbManager = {}
                     ..items[z].fechaFin.."',"
                     ..items[z].idComercio..",'"
                     ..items[z].code.."','"
-                    ..items[z].terminosCondiciones.."');"
+                    ..items[z].terminosCondiciones.."',"
+					..items[z].redimido..");"
             db:exec( query )
         end
     

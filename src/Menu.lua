@@ -11,6 +11,7 @@ function Menu:new()
     
     local widget = require( "widget" )
     local Sprites = require('src.resources.Sprites')
+	local DBManager = require('src.resources.DBManager')
     local fxTap = audio.loadSound( "fx/click.wav")
     
     -- Variables
@@ -35,6 +36,11 @@ function Menu:new()
         local t = event.target
         t:setFillColor( .9 ) 
         timer.performWithDelay( 150, function() t:setFillColor( .95 ) end, 1 )
+		
+		-- Delete Map
+		if not (t.opt == 'map') then
+			verifyMap()
+		end
         
         -- Do by menu
         if t.opt == 'all' then
@@ -53,7 +59,9 @@ function Menu:new()
             hideMenu()
             storyboard.gotoScene( "src.Reload", {time = 500, effect = "crossFade"})
         elseif t.opt == 'close' then
-            hideMenu()
+			hideMenu()
+            DBManager.updateUser(0,0)
+			storyboard.gotoScene( "src.Login", {delay = 500, time = 500, effect = "crossFade"})
         end
     end
     
@@ -63,6 +71,7 @@ function Menu:new()
         timer.performWithDelay( 150, function() t:setFillColor( .95 ) end, 1 )
         
         -- Get coupons
+		verifyMap()
         hideMenu()
         getCouponsBy(t.id)
     end

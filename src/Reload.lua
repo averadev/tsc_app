@@ -24,7 +24,8 @@ local countTimer = 1
 local cupones = {}
 local txtInfo, timeDownloading
 
-local urlApi = "http://192.168.1.197/thesavingcoupon/"
+-- local urlApi = "http://localhost/thesavingcoupon/"
+local urlApi = "http://thesavingcoupon.com/beta/"
 
 ---------------------------------------------------------------------------------
 -- FUNCTIONS

@@ -17,7 +17,7 @@ storyboard = require "storyboard"
 
 
 -- Create and change scene
-local isUser = DBManager.setupSquema()
+local isUser = false --DBManager.setupSquema()
 local isLoaded = DBManager.isLoaded()
 
 
