@@ -9,6 +9,7 @@
 ---------------------------------------------------------------------------------
 local storyboard = require( "storyboard" )
 local widget = require( "widget" )
+local json = require("json")
 local DBManager = require('src.resources.DBManager')
 local scene = storyboard.newScene()
 
@@ -34,6 +35,9 @@ local isHome, isLocation = true, false
 
 -- Arrays
 local txtPhones = { 
+	{"The Saving Coupon", ""},
+	{"Office", "987-869-0697"},
+	{"Whatsapp", "+52 (987) 117-1172"},
     {"Emergencies", ""},
     {"Emergencies", "066"},
     {"Police", "987-872-0409"},
@@ -164,6 +168,24 @@ function getMap()
 	end
 end
 
+function printTable(table, stringPrefix)
+	if not stringPrefix then
+		stringPrefix = "### "
+	end
+	if type(table) == "table" then
+		for key, value in pairs(table) do
+			if type(value) == "table" then
+				print(stringPrefix .. tostring(key))
+				print(stringPrefix .. "{")
+				printTable(value, stringPrefix .. "   ")
+				print(stringPrefix .. "}")
+			else
+				print(stringPrefix .. tostring(key) .. ": " .. tostring(value))
+			end
+		end
+	end
+end
+
 function getAbout()
     scrollView.alpha = 0
     cleanItems()
@@ -175,6 +197,55 @@ function getAbout()
     imageDesc.x, imageDesc.y = 240, 0
     items[1]:insert(imageDesc)
     local aboutY = 160
+	
+	-- Obtener el clima
+	local netConn = require('socket').connect('www.google.com', 80)
+    if not (netConn == nil) then
+		print ("internet") 
+        local function callWeather(event)
+			local data = json.decode(event.response)
+			if data and data.currently then
+				local imgIcon = display.newImage( "img/weather/"..data.currently.icon..".png" )
+				if imgIcon then
+    				items[1]:insert(imgIcon)
+					imgIcon:translate( intX / 4, 180 )
+				end
+				local txtWeather = display.newText(data.currently.summary, intX / 4, 220, "OpenSans-Regular", 18)
+				txtWeather:setFillColor( 0 )
+				items[1]:insert(txtWeather)
+				
+				local offTime = data.offset * 3600
+				local unixTime = data.currently.time + offTime
+				print("unixTime: "..unixTime)
+				print(os.date("%H:%M %S %z, %Z ", data.currently.time))
+				
+			end
+			return true
+		end
+		local function callTime(event)
+			local xml = event.response
+			local posc1 = string.find(xml, "localtime")
+			local posc2 = string.find(xml, "/localtime")
+			
+			if posc1 > 0 then
+				local timetxt =  string.sub(xml, posc1 + 10, posc2 -2)
+				
+				local txtWeather = display.newText(timetxt, intX / 5 + midX, 185, "OpenSans-Regular", 16)
+				txtWeather:setFillColor( 0 )
+				items[1]:insert(txtWeather)
+				local txtWeather = display.newText("Local Time", intX / 5 + midX, 220, "OpenSans-Regular", 18)
+				txtWeather:setFillColor( 0 )
+				items[1]:insert(txtWeather)
+				
+			end
+			return true
+		end
+		-- Do request
+		network.request( "https://api.forecast.io/forecast/999f1dab42b2fcff45367eefd1a89865/20.25,-86.55", "GET", callWeather )
+		network.request( "http://www.earthtools.org/timezone-1.1/4.28/-74.22", "GET", callTime )
+		aboutY = 260
+    end
+	
     
     for z = 1, #txtAbout, 1 do 
         local txtDesc = display.newText(txtAbout[z], 230, aboutY, 400, 0, "OpenSans-Regular", 16)
@@ -197,6 +268,7 @@ function getAbout()
             end
         end
     end
+	scrollView:setScrollHeight(aboutY)
     transition.to( scrollView, { alpha = 1, time = 300, delay = 300 } )
 end
 
@@ -250,7 +322,7 @@ function getPhones()
             phonesY = phonesY + 70
         end
     end
-    
+    scrollView:setScrollHeight(phonesY)
     transition.to( scrollView, { alpha = 1, time = 300, delay = 300 } )
 end
 
@@ -259,6 +331,7 @@ function showAll()
     for z = 1, #cupones, 1 do 
         addCoupon(cupones[z])
     end
+	scrollView:setScrollHeight(lastY - 200)
 end
 
 function showScroll(event)
@@ -421,6 +494,8 @@ function addDetail(index)
 	-- Margin Fix
     local bgShapeTWhite = display.newRect(items[1], midX, 770 + termH, 1, 1 )
     bgShapeTWhite:setFillColor( .95 )
+	
+	scrollView:setScrollHeight(750 + termH)
 end
 
 ---------------------------------------------------------------------------------

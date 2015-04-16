@@ -53,7 +53,7 @@ function getReturnButtons()
 end
 
 function getCouponBook()
-	system.openURL( "http://thesavingcoupon.com" )
+	system.openURL( "http://thesavingcoupon.com/movil" )
 end
 
 function showMask(isDo)
@@ -132,14 +132,14 @@ function scene:createScene( event )
     imgFields.x = midX
 	imgFields.y = midY
     
-    txtEmail = native.newTextField( midX, midY - 30, 380, 60 )
+    txtEmail = native.newTextField( midX, midY - 30, 380, 48 )
     txtEmail.inputType = "email"
     txtEmail.hasBackground = false
     txtEmail.placeholder = "your@email.com"
     txtEmail:addEventListener( "userInput", onTxtFocus )
 	grpLogin:insert(txtEmail)
     
-    txtPass = native.newTextField( midX, midY + 35, 380, 60 )
+    txtPass = native.newTextField( midX, midY + 35, 380, 48 )
     txtPass.isSecure = true
     txtPass.hasBackground = false
     txtPass.placeholder = "password"
@@ -157,12 +157,17 @@ function scene:createScene( event )
     txtLogin:setFillColor( 1 )
     grpLogin:insert(txtLogin)
 	
-	local txtGetTSC = display.newText( "Get a coupon book", midX + 60, midY + 190, 250, 22, "OpenSans-ExtraBold", 18)
+	local bgLink = display.newRect(  midX, midY + 210, 220, 60 )
+	bgLink:setFillColor( .5 )
+	bgLink.alpha = .01
+    bgLink:addEventListener( "tap", getCouponBook )
+	grpLogin:insert( bgLink )
+	
+	local txtGetTSC = display.newText( "NOT A MEMBER CLICK HERE", midX + 30, midY + 200, 250, 22, "OpenSans-ExtraBold", 18)
     txtGetTSC:setFillColor( 1 )
-    txtGetTSC:addEventListener( "tap", getCouponBook )
     grpLogin:insert(txtGetTSC)
 	
-	local lineLink = display.newRect(  midX + 15, midY + 210, 200, 1 )
+	local lineLink = display.newRect(  midX, midY + 220, 220, 1 )
 	lineLink:setFillColor( .3 )
 	grpLogin:insert( lineLink )
     
