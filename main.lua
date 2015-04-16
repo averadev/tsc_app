@@ -23,10 +23,10 @@ local isLoaded = DBManager.isLoaded()
 
 if isUser then
     if isLoaded then
-        storyboard.gotoScene("src.Home")
+        storyboard.gotoScene("src.Home"	)
     else
         storyboard.gotoScene("src.Reload")
-    end
+    end	
 else
     storyboard.gotoScene("src.Login")
 end
