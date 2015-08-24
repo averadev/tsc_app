@@ -452,11 +452,9 @@ function addDetail(index)
     txtDesc:setFillColor( .2 )
     
 	if item.redimido == 1 then
-		local txtCode0 = display.newText(items[1], "Code: ", midX - 70, 455,  "OpenSans-Semibold", 30)
+		local txtCode0 = display.newText(items[1], "Code: "..item.code, midX, 455,  "OpenSans-Semibold", 30)
 		txtCode0:setFillColor( .2 )
-		local txtCode = display.newText(items[1], item.code, midX + 50, 455,  "OpenSans-ExtraBold", 30)
-		txtCode:setFillColor( .2 )
-		local underline = display.newLine(items[1], midX - 15, 475, midX + 120, 475 )
+		local underline = display.newLine(items[1], midX - 150, 475, midX + 150, 475 )
 		underline:setStrokeColor( .2)
 		underline.strokeWidth = 2
 	else
