@@ -475,7 +475,7 @@ function addDetail(index)
     local bgShapeTWhite = display.newRect(items[1], midX, 725, 450, 148 )
     bgShapeTWhite:setFillColor( 1 )
     -- Terminos y Condiciones
-    local txtTitleTerm = display.newText(items[1], "Terminos y Condiciones: ", midX, 680, 420, 22,  "OpenSans-Semibold", 20)
+    local txtTitleTerm = display.newText(items[1], "Terms and Conditions: ", midX, 680, 420, 22,  "OpenSans-Semibold", 20)
     txtTitleTerm:setFillColor( .4 )
     local txtTerminos = display.newText(items[1], item.terminosCondiciones, midX, 740, 420, 0,  "OpenSans-Semibold", 16)
     txtTerminos:setFillColor( .4 )

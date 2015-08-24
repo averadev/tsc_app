@@ -132,14 +132,14 @@ function scene:createScene( event )
     imgFields.x = midX
 	imgFields.y = midY
     
-    txtEmail = native.newTextField( midX, midY - 30, 380, 48 )
+    txtEmail = native.newTextField( midX, midY - 30, 380, 40 )
     txtEmail.inputType = "email"
     txtEmail.hasBackground = false
     txtEmail.placeholder = "your@email.com"
     txtEmail:addEventListener( "userInput", onTxtFocus )
 	grpLogin:insert(txtEmail)
     
-    txtPass = native.newTextField( midX, midY + 35, 380, 48 )
+    txtPass = native.newTextField( midX, midY + 35, 380, 40 )
     txtPass.isSecure = true
     txtPass.hasBackground = false
     txtPass.placeholder = "password"
