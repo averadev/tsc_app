@@ -8,6 +8,7 @@ function Menu:new()
     local midX = display.contentCenterX
     local midY = display.contentCenterY
     local sbH = display.topStatusBarContentHeight
+    local posY, scrollMenu
     
     local widget = require( "widget" )
     local Sprites = require('src.resources.Sprites')
@@ -87,11 +88,15 @@ function Menu:new()
             iconCat:play()
             transition.to( grpCat, { alpha = 1, time = 400 } )
             transition.to( grpBottom, { y = 0, time = 400 } )
+            -- Set new scroll position
+            scrollMenu:setScrollHeight(posY)
         else
             iconCat:setSequence("close")
             iconCat:play()
             transition.to( grpCat, { alpha = 0, time = 400 } )
             transition.to( grpBottom, { y = #catList * (-60), time = 400 } )
+            -- Set new scroll position
+            scrollMenu:setScrollHeight(630)
         end 
         
     end
@@ -101,10 +106,10 @@ function Menu:new()
         
         -- Generales
         self.x = -400
-        local posY = sbH
+        posY = sbH
         catList = categories
         
-        local scrollMenu = widget.newScrollView
+        scrollMenu = widget.newScrollView
         {
             left = 0,
             top = 0,
@@ -222,9 +227,10 @@ function Menu:new()
                 
                 posY = posY + 60
             end
-            
-            
         end
+        
+        -- Set new scroll position
+        scrollMenu:setScrollHeight(630)
         
         -- Close Categories
         grpCat.alpha = 0
