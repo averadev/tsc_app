@@ -132,14 +132,14 @@ function scene:createScene( event )
     imgFields.x = midX
 	imgFields.y = midY
     
-    txtEmail = native.newTextField( midX, midY - 30, 380, 40 )
+    txtEmail = native.newTextField( midX, midY - 30, 380, 34 )
     txtEmail.inputType = "email"
     txtEmail.hasBackground = false
     txtEmail.placeholder = "your@email.com"
     txtEmail:addEventListener( "userInput", onTxtFocus )
 	grpLogin:insert(txtEmail)
     
-    txtPass = native.newTextField( midX, midY + 35, 380, 40 )
+    txtPass = native.newTextField( midX, midY + 35, 380, 34 )
     txtPass.isSecure = true
     txtPass.hasBackground = false
     txtPass.placeholder = "password"
@@ -157,19 +157,6 @@ function scene:createScene( event )
     txtLogin:setFillColor( 1 )
     grpLogin:insert(txtLogin)
 	
-	local bgLink = display.newRect(  midX, midY + 210, 220, 60 )
-	bgLink:setFillColor( .5 )
-	bgLink.alpha = .01
-    bgLink:addEventListener( "tap", getCouponBook )
-	grpLogin:insert( bgLink )
-	
-	local txtGetTSC = display.newText( "NOT A MEMBER CLICK HERE", midX + 30, midY + 200, 250, 22, "OpenSans-ExtraBold", 18)
-    txtGetTSC:setFillColor( 1 )
-    grpLogin:insert(txtGetTSC)
-	
-	local lineLink = display.newRect(  midX, midY + 220, 220, 1 )
-	lineLink:setFillColor( .3 )
-	grpLogin:insert( lineLink )
     
     -- Loading
     grpMask = display.newGroup()

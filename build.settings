@@ -34,7 +34,7 @@ settings = {
                 "Icon-Small@3x.png"
             },
             
-            CFBundleShortVersionString = "1"
+            CFBundleShortVersionString = "1.2"
             
         },
         UIAppFonts = {
